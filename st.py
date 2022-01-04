@@ -1,12 +1,17 @@
 import cv2
-import dlib
+
+img = cv2.imread('duck.jpg')
+img=cv2.resize(img, (500,500))
+rows, cols = img.shape[:2]
 
 
-img=cv2.imread('duck.jpg')
-dst=cv2.resize(img, (500,500)) #크기가 너무 커서 조정함
-rotate90=cv2.rotate(dst, cv2.ROTATE_90_CLOCKWISE) #90도 회전
-cv2.imshow('duck', dst) #원본 띄우기
-cv2.imshow('duck90', rotate90) #90도 회전한 것 띄우기
+# 이미지의 중심점을 기준으로 90도 회전 하면서 0.5배 Scale
+M= cv2.getRotationMatrix2D((cols/2, rows/2),45, 1)
 
-cv2.waitKey(0) #키보드 입력 생길 때까지 기다리기
-cv2.destroyAllWindows() #키보드 입력 발생하면 창 닫기
+dst = cv2.warpAffine(img, M,(cols, rows))
+
+cv2.imshow('Original', img)
+cv2.imshow('Rotation', dst)
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()
