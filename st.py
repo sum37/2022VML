@@ -6,7 +6,7 @@ rows, cols = img.shape[:2]
 
 
 # 이미지의 중심점을 기준으로 90도 회전 하면서 0.5배 Scale
-M= cv2.getRotationMatrix2D((cols/2, rows/2),45, 1)
+M= cv2.getRotationMatrix2D((cols/3, rows/2),45, 0.5)
 
 dst = cv2.warpAffine(img, M,(cols, rows))
 
