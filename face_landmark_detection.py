@@ -86,8 +86,11 @@ for f in glob.glob(os.path.join(faces_folder_path, "*.jpg")):
         # 랜드마크가 표시된 이미지를 openCV 윈도에 표시
         cv2.imshow('Face', cvImg)
 
+    print("Here: only eye")
+    for i in range 
     # 무한 대기를 타고 있다가 ESC 키가 눌리면 빠져나와 다음 이미지를 검색한다.
     while True:
         if cv2.waitKey(0) == ESC_KEY:
             break;
+        
 cv2.destroyWindow('Face')
