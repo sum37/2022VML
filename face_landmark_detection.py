@@ -46,8 +46,6 @@ img2=cv2.resize(img2, (width, height))
 #eye detecting, img1
 cvImg1 = swapRGB2BGR(img1, img1)    
 dets1 = detector(img1, 1)
-
-print("Number of faces detected: {}".format(len(dets1)))
     
 left_x_1=0
 left_y_1=0
@@ -56,31 +54,30 @@ right_y_1=0
     
 for k, d in enumerate(dets1):   
     shape = predictor(img1, d) ##shape size가 68개 
-    print(shape.num_parts)
     for i in range(0, shape.num_parts):
         if i>=36 and i<=41:
             x = shape.part(i).x
             y = shape.part(i).y
-            print(str(x) + " " + str(y))
             cv2.putText(cvImg1, str(i), (x, y), cv2.FONT_HERSHEY_SCRIPT_SIMPLEX, 0.3, (0, 255, 0))
             left_x_1+=x
             left_y_1+=y
         if i>=42 and i<=47:
             x = shape.part(i).x
             y = shape.part(i).y
-            print(str(x) + " " + str(y))
             cv2.putText(cvImg1, str(i), (x, y), cv2.FONT_HERSHEY_SCRIPT_SIMPLEX, 0.3, (0, 255, 0))
             right_x_1+=x
             right_y_1+=y
-        print(left_x_1/6)
-        print(left_y_1/6)
-        print(right_x_1/6)
-        print(right_y_1/6)   
         
     cv2.circle(cvImg1, (int(left_x_1/6),int(left_y_1/6)), 3, (0, 0, 255), -1)
     cv2.circle(cvImg1, (int(right_x_1/6),int(right_y_1/6)), 3, (0, 0, 255), -1)
                        
     cv2.imshow('Face_1', cvImg1)
+
+print("Here is img1")
+print(int(left_x_1/6))
+print(int(left_y_1/6))
+print(int(right_x_1/6))
+print(int(right_y_1/6))  
 
 #eye detecting, img2
 cvImg2 = swapRGB2BGR(img2, img2)    
@@ -93,31 +90,49 @@ right_y_2=0
     
 for k, d in enumerate(dets2):   
     shape = predictor(img2, d) ##shape size가 68개 
-    print(shape.num_parts)
     for i in range(0, shape.num_parts):
         if i>=36 and i<=41:
             x = shape.part(i).x
             y = shape.part(i).y
-            print(str(x) + " " + str(y))
             cv2.putText(cvImg2, str(i), (x, y), cv2.FONT_HERSHEY_SCRIPT_SIMPLEX, 0.3, (0, 255, 0))
             left_x_2+=x
             left_y_2+=y
         if i>=42 and i<=47:
             x = shape.part(i).x
             y = shape.part(i).y
-            print(str(x) + " " + str(y))
             cv2.putText(cvImg2, str(i), (x, y), cv2.FONT_HERSHEY_SCRIPT_SIMPLEX, 0.3, (0, 255, 0))
             right_x_2+=x
             right_y_2+=y
-        print(left_x_2/6)
-        print(left_y_2/6)
-        print(right_x_2/6)
-        print(right_y_2/6)   
-        
+                   
     cv2.circle(cvImg2, (int(left_x_2/6),int(left_y_2/6)), 3, (0, 0, 255), -1)
     cv2.circle(cvImg2, (int(right_x_2/6),int(right_y_2/6)), 3, (0, 0, 255), -1)
-                       
+
+print("Here is img2")
+print(int(left_x_2/6))
+print(int(left_y_2/6))
+print(int(right_x_2/6))
+print(int(right_y_2/6)) 
+                         
 cv2.imshow('Face_2', cvImg2)
+
+# 이미지 기준 정하고 만들기 . . .. . . . .
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #blending
 alpha=0.5
