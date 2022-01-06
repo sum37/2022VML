@@ -3,6 +3,7 @@ import os
 import dlib
 import glob
 import cv2
+import numpy as np
 
 ESC_KEY = 27
 
@@ -31,11 +32,18 @@ predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 #create window
 cv2.namedWindow('Face_1')
 cv2.namedWindow('Face_2')
+cv2.namedWindow('Combine')
 
 #load two images    
 img1 = dlib.load_rgb_image("./me.jpg")      
-img2 = dlib.load_rgb_image("./winter.jpg")      
+img2 = dlib.load_rgb_image("./winter.jpg")
 
+#match picture size
+width=img1.shape[1]
+height=img1.shape[0]
+img2=cv2.resize(img2, (width, height))
+
+#eye detecting, img1
 cvImg1 = swapRGB2BGR(img1, img1)    
 dets1 = detector(img1, 1)
 
@@ -74,11 +82,10 @@ for k, d in enumerate(dets1):
                        
     cv2.imshow('Face_1', cvImg1)
 
+#eye detecting, img2
 cvImg2 = swapRGB2BGR(img2, img2)    
 dets2 = detector(img2, 1)
 
-print("Number of faces detected: {}".format(len(dets2)))
-    
 left_x_2=0
 left_y_2=0
 right_x_2=0
@@ -111,6 +118,17 @@ for k, d in enumerate(dets2):
     cv2.circle(cvImg2, (int(right_x_2/6),int(right_y_2/6)), 3, (0, 0, 255), -1)
                        
 cv2.imshow('Face_2', cvImg2)
+
+#blending
+alpha=0.5
+img3=img1*alpha+img2*(1-alpha)
+img3=img3.astype(np.uint8)
+
+#show img3
+cvImg3 = swapRGB2BGR(img3, img3) 
+cv2.imshow('Combine', cvImg3)
+
+#break if 
 while True:
     if cv2.waitKey(0) == ESC_KEY:
         break;
