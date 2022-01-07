@@ -32,18 +32,21 @@ predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 #create window
 cv2.namedWindow('Face_1')
 cv2.namedWindow('Face_2')
-cv2.namedWindow('before_translation')
 cv2.namedWindow('Combine')
 
 #load two images    
-img1 = dlib.load_rgb_image("./me.jpg")      
-img2 = dlib.load_rgb_image("./winter.jpg")
+img1 = dlib.load_rgb_image("./winter.jpg")      
+img2 = dlib.load_rgb_image("./me.jpg")
+
+print("aa", len(img1))
+
 
 #match picture size
 width1=img1.shape[1]
 height1=img1.shape[0]
 width2=img2.shape[1]
 height2=img2.shape[0]
+
 if width2>=width1:
     img2=cv2.resize(img2, (width1, height1))
 else:
@@ -77,18 +80,12 @@ for k, d in enumerate(dets1):
     cv2.circle(cvImg1, (int(left_x_1/6),int(left_y_1/6)), 3, (0, 0, 255), -1)
     cv2.circle(cvImg1, (int(right_x_1/6),int(right_y_1/6)), 3, (0, 0, 255), -1)
                        
-    #cv2.imshow('Face_1', cvImg1)
+    cv2.imshow('Face_1', cvImg1)
 
 left_x_1=left_x_1/6
 left_y_1=left_y_1/6
 right_x_1=right_x_1/6
 right_y_1=right_y_1/6
-
-print("Here is img1")
-print(int(left_x_1))
-print(int(left_y_1))
-print(int(right_x_1))
-print(int(right_y_1))  
 
 #eye detecting, img2
 cvImg2 = swapRGB2BGR(img2, img2)    
@@ -122,34 +119,44 @@ left_x_2=left_x_2/6
 left_y_2=left_y_2/6
 right_x_2=right_x_2/6
 right_y_2=right_y_2/6
-
-print("Here is img2")
-print(int(left_x_2))
-print(int(left_y_2))
-print(int(right_x_2))
-print(int(right_y_2)) 
                          
-#cv2.imshow('Face_2', cvImg2)
-
-# 이미지 기준 정하고 만들기 . . .. . . . .
-print("size of pic")
-print("point")
-point1=(int((left_x_1+right_x_1)/2),int((right_y_1+left_y_1)/2))
-print(point1)
-point2=(int((left_x_1+right_x_2)/2),int((right_y_1+left_y_2)/2))
-print(point2)
-print(point1[0])
+cv2.imshow('Face_2', cvImg2)
 
 #간격 비교
 dis1= ((left_x_1-right_x_1)**2+(left_y_1-right_y_1)**2)**0.5
 dis2= ((left_x_2-right_x_2)**2+(left_y_2-right_y_2)**2)**0.5
 
-#x1-x2만큼 이동해야함
+#비율 따지기 ....
+p=dis1/dis2
+#img2=cv2.resize(img2, None, fx=1/p, fy=1/p)
+
+#vector 생성
+img1_vector=[right_x_1-left_x_1, right_y_1-left_y_1]
+img2_vector=[right_x_2-left_x_2, right_y_2-left_y_2]
+print("here vector")
+print(img1_vector)
+print(img2_vector)
+
+#vector간 각도 구하기
+unit_img1_vector=img1_vector/np.linalg.norm(img1_vector)
+unit_img2_vector=img2_vector/np.linalg.norm(img2_vector)
+dot_product=np.dot(unit_img1_vector, unit_img2_vector)
+print(unit_img1_vector)
+print(unit_img2_vector)
+angle=np.arccos(dot_product)
+print("here angle")
+print(angle)
+
+#rotate, center: eye
 rows, cols=img2.shape[:2]
+N=cv2.getRotationMatrix2D((left_x_2, left_y_2), angle*180/3.14, 1)
+rotation_img2=cv2.warpAffine(img2, N, (cols, rows))
+
+#x1-x2만큼 이동해야함
 diff_x=left_x_1-left_x_2
 diff_y=left_y_1-left_y_2
 M=np.float32([[1,0,diff_x], [0,1,diff_y]])
-translation_img2=cv2.warpAffine(img2,M,(cols, rows))
+translation_img2=cv2.warpAffine(rotation_img2,M,(cols, rows))
 
 #blending
 alpha=0.5
@@ -157,15 +164,9 @@ alpha=0.5
 img3=img1*alpha+translation_img2*(1-alpha)
 img3=img3.astype(np.uint8)
 
-img4=img1*alpha+img2*(1-alpha)
-img4=img4.astype(np.uint8)
-
 #show img3
 cvImg3 = swapRGB2BGR(img3, img3) 
 cv2.imshow('Combine', cvImg3)
-
-cvImg4 = swapRGB2BGR(img4, img4) 
-cv2.imshow('before_translation', cvImg4)
 
 #break if 
 while True:
