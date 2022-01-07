@@ -30,8 +30,8 @@ detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 
 #create window
-cv2.namedWindow('Face_1')
-cv2.namedWindow('Face_2')
+# cv2.namedWindow('Face_1')
+# cv2.namedWindow('Face_2')
 cv2.namedWindow('Combine')
 
 #load two images    
@@ -80,7 +80,7 @@ for k, d in enumerate(dets1):
     cv2.circle(cvImg1, (int(left_x_1/6),int(left_y_1/6)), 3, (0, 0, 255), -1)
     cv2.circle(cvImg1, (int(right_x_1/6),int(right_y_1/6)), 3, (0, 0, 255), -1)
                        
-    cv2.imshow('Face_1', cvImg1)
+    # cv2.imshow('Face_1', cvImg1)
 
 left_x_1=left_x_1/6
 left_y_1=left_y_1/6
@@ -120,7 +120,7 @@ left_y_2=left_y_2/6
 right_x_2=right_x_2/6
 right_y_2=right_y_2/6
                          
-cv2.imshow('Face_2', cvImg2)
+# cv2.imshow('Face_2', cvImg2)
 
 #간격 비교
 dis1= ((left_x_1-right_x_1)**2+(left_y_1-right_y_1)**2)**0.5
