@@ -1,46 +1,27 @@
-import sys
-import os
-import dlib
-import glob
 import cv2
 import numpy as np
 
-ESC_KEY = 27
+img=cv2.imread('./winter.jpg')
 
-def swapRGB2BGR(rgb, img):
-    r, g, b = cv2.split(img)
-    bgr = cv2.merge([b,g,r])
-    return bgr
+height=img.shape[0]
+width=img.shape[1]
 
-if len(sys.argv) != 3:
-    print(
-        "Give the path to the trained shape predictor model as the first "
-        "argument and then the directory containing the facial images.\n"
-        "For example, if you are in the python_examples folder then "
-        "execute this program by running:\n"
-        "    ./face_landmark_detection.py shape_predictor_68_face_landmarks.dat ../examples/faces\n"
-        "You can download a trained facial shape predictor from:\n"
-        "    http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2")
-    exit()
+bg_width=width+100
+bg_height=height+100
+color=(0,0,0)
+bg=np.full((bg_height, bg_width, img.shape[2]), color, dtype=np.uint8)
 
-predictor_path = sys.argv[1]
-faces_folder_path = sys.argv[2]
+x_center = (bg_width - width) // 2
+y_center = (bg_height - height) // 2
 
-detector = dlib.get_frontal_face_detector()
-predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
+# copy img image into center of result image
+bg[y_center:y_center+height, 
+       x_center:x_center+width] = img
 
-#create window
-cv2.namedWindow('Hi')
+# view result
+cv2.imshow("result", bg)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
 
-#load two images    
-img1 = dlib.load_rgb_image("./winter.jpg")      
-img2 = dlib.load_rgb_image("./me.jpg")
-
-
-
-#break if 
-while True:
-    if cv2.waitKey(0) == ESC_KEY:
-        break;
-        
-cv2.destroyWindow('Face')
+# save result
+cv2.imwrite("./winter.jpg", bg)
