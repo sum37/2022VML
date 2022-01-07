@@ -40,9 +40,14 @@ img1 = dlib.load_rgb_image("./me.jpg")
 img2 = dlib.load_rgb_image("./winter.jpg")
 
 #match picture size
-width=img1.shape[1]
-height=img1.shape[0]
-
+width1=img1.shape[1]
+height1=img1.shape[0]
+width2=img2.shape[1]
+height2=img2.shape[0]
+if width2>=width1:
+    img2=cv2.resize(img2, (width1, height1))
+else:
+    img1=cv2.resize(img1, (width2, height2))
 
 #eye detecting, img1
 cvImg1 = swapRGB2BGR(img1, img1)    
@@ -72,7 +77,7 @@ for k, d in enumerate(dets1):
     cv2.circle(cvImg1, (int(left_x_1/6),int(left_y_1/6)), 3, (0, 0, 255), -1)
     cv2.circle(cvImg1, (int(right_x_1/6),int(right_y_1/6)), 3, (0, 0, 255), -1)
                        
-    cv2.imshow('Face_1', cvImg1)
+    #cv2.imshow('Face_1', cvImg1)
 
 left_x_1=left_x_1/6
 left_y_1=left_y_1/6
@@ -124,12 +129,10 @@ print(int(left_y_2))
 print(int(right_x_2))
 print(int(right_y_2)) 
                          
-cv2.imshow('Face_2', cvImg2)
+#cv2.imshow('Face_2', cvImg2)
 
 # 이미지 기준 정하고 만들기 . . .. . . . .
 print("size of pic")
-print(width)
-print(height)
 print("point")
 point1=(int((left_x_1+right_x_1)/2),int((right_y_1+left_y_1)/2))
 print(point1)
@@ -141,10 +144,6 @@ print(point1[0])
 dis1= ((left_x_1-right_x_1)**2+(left_y_1-right_y_1)**2)**0.5
 dis2= ((left_x_2-right_x_2)**2+(left_y_2-right_y_2)**2)**0.5
 
-#비율 따지기 ....
-p=dis1/dis2
-img2=cv2.resize(img2, None, fx=1/p, fy=1/p)
-
 #x1-x2만큼 이동해야함
 rows, cols=img2.shape[:2]
 diff_x=left_x_1-left_x_2
@@ -152,16 +151,11 @@ diff_y=left_y_1-left_y_2
 M=np.float32([[1,0,diff_x], [0,1,diff_y]])
 translation_img2=cv2.warpAffine(img2,M,(cols, rows))
 
-
-
-
-
-
-
-
 #blending
 alpha=0.5
-img3=cv2.addWeighted(img1, 0.5, img2, 0.5, 0.0)
+
+img3=img1*alpha+translation_img2*(1-alpha)
+img3=img3.astype(np.uint8)
 
 img4=img1*alpha+img2*(1-alpha)
 img4=img4.astype(np.uint8)
