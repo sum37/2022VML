@@ -22,6 +22,3 @@ bg[y_center:y_center+height,
 cv2.imshow("result", bg)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
-
-# save result
-cv2.imwrite("./winter.jpg", bg)
