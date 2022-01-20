@@ -13,5 +13,6 @@ for cols_index in range(width):
 
 # view result
 cv2.imshow("result", img)
+
 cv2.waitKey(0)
 cv2.destroyAllWindows()
