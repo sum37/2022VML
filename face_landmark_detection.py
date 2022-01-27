@@ -31,8 +31,7 @@ predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 #load two images    
 img1 = dlib.load_rgb_image("./taeyeon.jpg")      
 img2 = dlib.load_rgb_image("./winter.jpg")
-
-img2=cv2.resize(img2, (img2.shape[1]//3, img2.shape[0]//3))
+img2=cv2.resize(img2, (img2.shape[1]//4, img2.shape[0]//4))
 
 #size
 width1=img1.shape[1]
@@ -40,10 +39,34 @@ height1=img1.shape[0]
 width2=img2.shape[1]
 height2=img2.shape[0]
 
+print("here is size with padding")
+print(width1)
+print(height1)
+print(width2)
+print(height2)
+
+#padding: To prevent the picture from being cut off
+padding1=np.full((height1*2, width1*2, 3), (0,0,0), dtype=np.uint8)
+padding2=np.full((height2*2, width2*2, 3), (0,0,0), dtype=np.uint8)
+padding1[height1//2:height1*3//2, width1//2:width1*3//2] = img1
+padding2[height2*2//4:height2*3//2, width2//2:width2*3//2] = img2
+
+#new size
+width1=padding1.shape[1]
+height1=padding1.shape[0]
+width2=padding2.shape[1]
+height2=padding2.shape[0]
+
+print("here is size with padding")
+print(width1)
+print(height1)
+print(width2)
+print(height2)
+
 #eye detecting, img1
-img1 = swapRGB2BGR(img1, img1)
+img1 = swapRGB2BGR(padding1, padding1)
 dets1 = detector(img1, 1)
-    
+
 left_x_1=0
 left_y_1=0
 right_x_1=0
@@ -65,8 +88,8 @@ for k, d in enumerate(dets1):
             right_x_1+=x
             right_y_1+=y
         
-    # cv2.circle(img1, (int(left_x_1/6),int(left_y_1/6)), 3, (0, 0, 255), -1)
-    # cv2.circle(img1, (int(right_x_1/6),int(right_y_1/6)), 3, (0, 0, 255), -1)
+    cv2.circle(img1, (int(left_x_1/6),int(left_y_1/6)), 3, (0, 0, 255), -1)
+    cv2.circle(img1, (int(right_x_1/6),int(right_y_1/6)), 3, (0, 0, 255), -1)
 
 left_x_1=left_x_1/6
 left_y_1=left_y_1/6
@@ -74,8 +97,8 @@ right_x_1=right_x_1/6
 right_y_1=right_y_1/6
 
 #eye detecting, img2
-img2 = swapRGB2BGR(img2, img2)    
-dets2 = detector(img2, 1)
+img2 = swapRGB2BGR(padding2, padding2)    
+dets2 = detector(padding2, 1)
 
 left_x_2=0
 left_y_2=0
@@ -98,8 +121,8 @@ for k, d in enumerate(dets2):
             right_x_2+=x
             right_y_2+=y
                          
-    # cv2.circle(img2, (int(left_x_2/6),int(left_y_2/6)), 3, (0, 0, 255), -1)
-    # cv2.circle(img2, (int(right_x_2/6),int(right_y_2/6)), 3, (0, 0, 255), -1)
+    cv2.circle(img2, (int(left_x_2/6),int(left_y_2/6)), 3, (0, 0, 255), -1)
+    cv2.circle(img2, (int(right_x_2/6),int(right_y_2/6)), 3, (0, 0, 255), -1)
     
 left_x_2=left_x_2/6
 left_y_2=left_y_2/6
@@ -127,11 +150,19 @@ else:
     newleft_x_2=left_x_2
     newleft_y_2=left_y_2
 
+print(p)
+
 #새로운 사이즈
 width1=img1.shape[1]
 height1=img1.shape[0]
 width2=img2.shape[1]
 height2=img2.shape[0]
+
+print("here is last size")
+print(width1)
+print(height1)
+print(width2)
+print(height2)
 
 #vector 생성
 img1_vector=[right_x_1-left_x_1, right_y_1-left_y_1]
@@ -144,9 +175,12 @@ dot_product=np.dot(unit_img1_vector, unit_img2_vector)
 angle=np.arccos(dot_product)
 
 #rotate, center: eye
-rows, cols=img2.shape[:2]
 N=cv2.getRotationMatrix2D((left_x_2, left_y_2), angle*180/3.14, 1)
 img2=cv2.warpAffine(img2, N, (width2, height2))
+
+cv2.imshow('hji', img1)
+cv2.imshow('ddf', img2)
+cv2.waitKey(0)
 
 #padding 가로, 세로 결정하기
 sizelist=[width1, width2, height1, height2]
@@ -158,11 +192,11 @@ y_padding1 = (newsize - height1) // 2
 x_padding2 = (newsize - width2) // 2
 y_padding2 = (newsize - height2) // 2
 
-# x1-x2만큼 이동해야함
-diff_x=newleft_x_1-newleft_x_2+x_padding1-x_padding2
-diff_y=newleft_y_1-newleft_y_2+y_padding1-y_padding2
-M=np.float32([[1,0,diff_x], [0,1,diff_y]])
-img2=cv2.warpAffine(img2,M,(width2, height2))
+# # x1-x2만큼 이동해야함
+# diff_x=newleft_x_1-newleft_x_2
+# diff_y=newleft_y_1-newleft_y_2
+# M=np.float32([[1,0,diff_x], [0,1,diff_y]])
+# img2=cv2.warpAffine(img2,M,(width2, height2))
 
 #making black img
 blackimg1=np.full((newsize, newsize, 3), (0,0,0), dtype=np.uint8)
